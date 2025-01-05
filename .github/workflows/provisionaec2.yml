@@ -1,4 +1,4 @@
-name: Provisiona máquinas EC2 Instance
+name: Provision EC2 Instance
 
 on:
   workflow_dispatch:
@@ -35,13 +35,18 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.6 # Substitua pela versão desejada
+
     - name: Initialize Terraform Backend
       run: terraform init
-      working-directory: ./terraform # Inicializa o backend no diretório raiz
+      working-directory: ./terraform
 
     - name: Initialize Terraform for EC2
       run: terraform init
-      working-directory: ./modules/ec2 # Inicializa o Terraform no módulo EC2
+      working-directory: ./modules/ec2
 
     - name: Terraform Plan
       run: terraform plan -var="instance_type=${{ github.event.inputs.instance_type }}" \
