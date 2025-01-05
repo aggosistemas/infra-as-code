@@ -44,24 +44,19 @@ jobs:
       run: terraform init
       working-directory: ./terraform
 
-    - name: Initialize Terraform for EC2
-      run: terraform init
-      working-directory: ./modules/ec2
-
     - name: Terraform Plan for EC2
-      run: terraform plan -var="instance_type=${{ github.event.inputs.instance_type }}" \
-                          -var="ami=${{ github.event.inputs.ami }}" \
-                          -var="key_name=${{ github.event.inputs.key_name }}" \
-                          -var="environment=${{ github.event.inputs.environment }}"
-      working-directory: ./modules/ec2
+      run: terraform -chdir=./modules/ec2 plan \
+           -var="instance_type=${{ github.event.inputs.instance_type }}" \
+           -var="ami=${{ github.event.inputs.ami }}" \
+           -var="key_name=${{ github.event.inputs.key_name }}" \
+           -var="environment=${{ github.event.inputs.environment }}"
 
     - name: Terraform Apply for EC2
-      run: terraform apply -auto-approve -var="instance_type=${{ github.event.inputs.instance_type }}" \
-                                             -var="ami=${{ github.event.inputs.ami }}" \
-                                             -var="key_name=${{ github.event.inputs.key_name }}" \
-                                             -var="environment=${{ github.event.inputs.environment }}"
-      working-directory: ./modules/ec2
+      run: terraform -chdir=./modules/ec2 apply -auto-approve \
+           -var="instance_type=${{ github.event.inputs.instance_type }}" \
+           -var="ami=${{ github.event.inputs.ami }}" \
+           -var="key_name=${{ github.event.inputs.key_name }}" \
+           -var="environment=${{ github.event.inputs.environment }}"
 
     - name: Output Terraform Results
-      run: terraform output
-      working-directory: ./modules/ec2
+      run: terraform -chdir=./modules/ec2 output
