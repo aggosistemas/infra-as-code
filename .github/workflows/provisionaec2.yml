@@ -44,6 +44,9 @@ jobs:
       run: terraform init
       working-directory: ./terraform
 
+    - name: Initialize Terraform for EC2
+      run: terraform -chdir=./modules/ec2 init
+
     - name: Terraform Plan for EC2
       run: terraform -chdir=./modules/ec2 plan -var="instance_type=${{ github.event.inputs.instance_type }}" -var="ami=${{ github.event.inputs.ami }}" -var="key_name=${{ github.event.inputs.key_name }}" -var="environment=${{ github.event.inputs.environment }}"
 
