@@ -48,16 +48,6 @@ jobs:
       with:
         terraform_version: 1.5.6
 
-    - name: Initialize Backend
-      run: |
-        terraform init \
-          -backend-config="bucket=terraform-bucket-status" \
-          -backend-config="key=terraform/state/global.tfstate" \
-          -backend-config="region=ca-central-1" \
-          -backend-config="encrypt=true" \
-          -backend-config="dynamodb_table=terraform-lock-table"
-      working-directory: ./terraform
-
     - name: Initialize Terraform for EC2
       run: terraform -chdir=./modules/ec2 init
 
