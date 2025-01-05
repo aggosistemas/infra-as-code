@@ -1,8 +1,16 @@
-name: Provision EC2 Instance
+name: EC2 Provisioning
 
 on:
   workflow_dispatch:
     inputs:
+      action:
+        description: "Escolha a ação: apply ou destroy"
+        required: true
+        default: "apply"
+        type: choice
+        options:
+          - apply
+          - destroy
       instance_type:
         description: "Tipo da instância EC2 (e.g., t2.micro)"
         required: true
@@ -40,18 +48,31 @@ jobs:
       with:
         terraform_version: 1.5.6
 
-    - name: Initialize Terraform Backend
-      run: terraform init
+    - name: Initialize Backend
+      run: terraform init -backend-config="bucket=seu-bucket-terraform" \
+                          -backend-config="key=terraform/state/global.tfstate" \
+                          -backend-config="region=us-east-1" \
+                          -backend-config="encrypt=true" \
+                          -backend-config="dynamodb_table=terraform-lock-table"
       working-directory: ./terraform
 
     - name: Initialize Terraform for EC2
       run: terraform -chdir=./modules/ec2 init
 
-    - name: Terraform Plan for EC2
-      run: terraform -chdir=./modules/ec2 plan -var="instance_type=${{ github.event.inputs.instance_type }}" -var="ami=${{ github.event.inputs.ami }}" -var="key_name=${{ github.event.inputs.key_name }}" -var="environment=${{ github.event.inputs.environment }}"
-
-    - name: Terraform Apply for EC2
-      run: terraform -chdir=./modules/ec2 apply -auto-approve -var="instance_type=${{ github.event.inputs.instance_type }}" -var="ami=${{ github.event.inputs.ami }}" -var="key_name=${{ github.event.inputs.key_name }}" -var="environment=${{ github.event.inputs.environment }}"
-
-    - name: Output Terraform Results
-      run: terraform -chdir=./modules/ec2 output
+    - name: Terraform Action
+      run: |
+        if [ "${{ github.event.inputs.action }}" == "apply" ]; then
+          terraform -chdir=./modules/ec2 apply -auto-approve \
+            -var="instance_type=${{ github.event.inputs.instance_type }}" \
+            -var="ami=${{ github.event.inputs.ami }}" \
+            -var="key_name=${{ github.event.inputs.key_name }}" \
+            -var="environment=${{ github.event.inputs.environment }}";
+        elif [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+          terraform -chdir=./modules/ec2 destroy -auto-approve \
+            -var="instance_type=${{ github.event.inputs.instance_type }}" \
+            -var="ami=${{ github.event.inputs.ami }}" \
+            -var="key_name=${{ github.event.inputs.key_name }}" \
+            -var="environment=${{ github.event.inputs.environment }}";
+        else
+          echo "Ação inválida: ${GITHUB_EVENT_INPUTS_ACTION}" && exit 1;
+        fi
