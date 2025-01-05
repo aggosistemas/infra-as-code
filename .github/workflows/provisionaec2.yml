@@ -1,4 +1,4 @@
-name: Provisionamento máquinas EC2 Instance
+name: Provision EC2 Instance
 
 on:
   workflow_dispatch:
@@ -44,17 +44,19 @@ jobs:
       run: terraform init
       working-directory: ./terraform
 
+    - name: Initialize Terraform for EC2
+      run: terraform init
+      working-directory: ./modules/ec2
+
     - name: Terraform Plan for EC2
-      run: |
-        terraform plan -var="instance_type=${{ github.event.inputs.instance_type }}" \
-                       -var="ami=${{ github.event.inputs.ami }}" \
-                       -var="key_name=${{ github.event.inputs.key_name }}" \
-                       -var="environment=${{ github.event.inputs.environment }}"
+      run: terraform plan -var="instance_type=${{ github.event.inputs.instance_type }}" \
+                          -var="ami=${{ github.event.inputs.ami }}" \
+                          -var="key_name=${{ github.event.inputs.key_name }}" \
+                          -var="environment=${{ github.event.inputs.environment }}"
       working-directory: ./modules/ec2
 
     - name: Terraform Apply for EC2
-      run: |
-        terraform apply -auto-approve -var="instance_type=${{ github.event.inputs.instance_type }}" \
+      run: terraform apply -auto-approve -var="instance_type=${{ github.event.inputs.instance_type }}" \
                                              -var="ami=${{ github.event.inputs.ami }}" \
                                              -var="key_name=${{ github.event.inputs.key_name }}" \
                                              -var="environment=${{ github.event.inputs.environment }}"
