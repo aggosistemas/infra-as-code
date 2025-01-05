@@ -49,11 +49,13 @@ jobs:
         terraform_version: 1.5.6
 
     - name: Initialize Backend
-      run: terraform init -backend-config="bucket=seu-bucket-terraform" \
-                          -backend-config="key=terraform/state/global.tfstate" \
-                          -backend-config="region=us-east-1" \
-                          -backend-config="encrypt=true" \
-                          -backend-config="dynamodb_table=terraform-lock-table"
+      run: |
+        terraform init \
+          -backend-config="bucket=seu-bucket-terraform" \
+          -backend-config="key=terraform/state/global.tfstate" \
+          -backend-config="region=us-east-1" \
+          -backend-config="encrypt=true" \
+          -backend-config="dynamodb_table=terraform-lock-table"
       working-directory: ./terraform
 
     - name: Initialize Terraform for EC2
