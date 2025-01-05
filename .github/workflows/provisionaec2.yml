@@ -1,4 +1,4 @@
-name: Provision EC2 Instance
+name: Provisionamento máquinas EC2 Instance
 
 on:
   workflow_dispatch:
@@ -38,25 +38,23 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: 1.5.6 # Substitua pela versão desejada
+        terraform_version: 1.5.6
 
     - name: Initialize Terraform Backend
       run: terraform init
       working-directory: ./terraform
 
-    - name: Initialize Terraform for EC2
-      run: terraform init
+    - name: Terraform Plan for EC2
+      run: |
+        terraform plan -var="instance_type=${{ github.event.inputs.instance_type }}" \
+                       -var="ami=${{ github.event.inputs.ami }}" \
+                       -var="key_name=${{ github.event.inputs.key_name }}" \
+                       -var="environment=${{ github.event.inputs.environment }}"
       working-directory: ./modules/ec2
 
-    - name: Terraform Plan
-      run: terraform plan -var="instance_type=${{ github.event.inputs.instance_type }}" \
-                          -var="ami=${{ github.event.inputs.ami }}" \
-                          -var="key_name=${{ github.event.inputs.key_name }}" \
-                          -var="environment=${{ github.event.inputs.environment }}"
-      working-directory: ./modules/ec2
-
-    - name: Terraform Apply
-      run: terraform apply -auto-approve -var="instance_type=${{ github.event.inputs.instance_type }}" \
+    - name: Terraform Apply for EC2
+      run: |
+        terraform apply -auto-approve -var="instance_type=${{ github.event.inputs.instance_type }}" \
                                              -var="ami=${{ github.event.inputs.ami }}" \
                                              -var="key_name=${{ github.event.inputs.key_name }}" \
                                              -var="environment=${{ github.event.inputs.environment }}"
