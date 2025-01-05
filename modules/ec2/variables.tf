@@ -33,3 +33,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "environment" {
+  description = "Nome do ambiente (e.g., dev, prod)"
+  type        = string
+  default     = "dev"
+}
