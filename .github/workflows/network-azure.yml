@@ -17,24 +17,19 @@ jobs:
     name: Terraform Network
     runs-on: ubuntu-latest
 
+    env:
+      TF_WORKING_DIR: backstage/azure/vnet
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
-
-      - name: Configurar credenciais AWS (Backend S3)
-        run: |
-          echo "Configurando AWS Credentials..."
-          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          export AWS_REGION=${{ secrets.AWS_REGION }}
-
-      - name: Configurar credenciais Azure (Provisionamento)
-        run: |
-          echo "Configurando Azure Credentials..."
-          export ARM_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}
-          export ARM_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}
-          export ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          export ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}
 
       - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v2
@@ -42,18 +37,19 @@ jobs:
           terraform_version: 1.6.6
 
       - name: Inicializar Terraform
-        run: terraform init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init -input=false -no-color
 
       - name: Validar configuração Terraform
-        run: terraform validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform validate -no-color
 
-      - name: Gerar plano Terraform
-        run: terraform plan
-
-      - name: Aplicar ou Destruir Terraform
+      - name: Aplicar recursos Terraform
         if: ${{ github.event.inputs.action == 'apply' }}
-        run: terraform apply -auto-approve
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform apply -input=false -no-color -auto-approve
 
       - name: Destruir recursos Terraform
         if: ${{ github.event.inputs.action == 'destroy' }}
-        run: terraform destroy -auto-approve
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform destroy -input=false -no-color -auto-approve
