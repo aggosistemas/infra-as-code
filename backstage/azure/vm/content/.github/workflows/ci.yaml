@@ -1,0 +1,59 @@
+name: Terraform Network Provisioning
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Escolha a ação a ser executada: apply ou destroy"
+        required: true
+        default: "apply"
+        type: choice
+        options:
+          - apply
+          - destroy
+
+jobs:
+  terraform:
+    name: Terraform Network
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciais AWS (Backend S3)
+        run: |
+          echo "Configurando AWS Credentials..."
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_REGION=${{ secrets.AWS_REGION }}
+
+      - name: Configurar credenciais Azure (Provisionamento)
+        run: |
+          echo "Configurando Azure Credentials..."
+          export ARM_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}
+          export ARM_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}
+          export ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          export ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.6
+
+      - name: Inicializar Terraform
+        run: terraform init
+
+      - name: Validar configuração Terraform
+        run: terraform validate
+
+      - name: Gerar plano Terraform
+        run: terraform plan
+
+      - name: Aplicar ou Destruir Terraform
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: terraform apply -auto-approve
+
+      - name: Destruir recursos Terraform
+        if: ${{ github.event.inputs.action == 'destroy' }}
+        run: terraform destroy -auto-approve

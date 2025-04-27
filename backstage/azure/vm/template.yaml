@@ -1,0 +1,53 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: azure-vm
+  title: VIRTUAL MACHINE
+  description: Template para criar e configurar uma máquina virtual na Microsoft Azure.
+  annotations:
+    backstage.io/icon: azure
+
+spec:
+  owner: equipe-dev
+  type: infrastructure
+
+  parameters:
+    - title: Configuração da VM
+      required:
+        - name
+        - description
+      properties:
+        name:
+          title: Nome
+          type: string
+          prefix: azure-vm
+          ui:field: PrefixedInputField
+        description:
+          title: Descrição
+          type: string
+
+  steps:
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+
+    - id: publish
+      name: Publicar Repositório
+      action: publish:github
+      input:
+        allowedHosts: [ 'github.com' ]
+        description: "Repositório criado pelo Pequistore para a VM Azure ${{ parameters.name }}"
+        repoUrl: "github.com?owner=PequiStore&repo=${{ parameters.name }}"
+        visibility: public
+
+    - id: register
+      name: Registrar Componente
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
