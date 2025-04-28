@@ -63,3 +63,8 @@ variable "ssh_key_name" {
   type        = string
   default     = "ssh-key-pequi"
 }
+
+variable "ssh_public_key" {
+  description = "Conteúdo da chave pública SSH que será inserida na VM"
+  type        = string
+}
