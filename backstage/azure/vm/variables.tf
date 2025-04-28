@@ -61,5 +61,5 @@ variable "admin_username" {
 variable "ssh_key_name" {
   description = "Nome do arquivo da chave SSH pública (sem extensão .pub)."
   type        = string
-  default     = "ssh-key-pequi-pipe"
+  default     = "ssh-key-pequi"
 }
