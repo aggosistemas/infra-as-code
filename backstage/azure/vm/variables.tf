@@ -52,8 +52,4 @@ variable "vm_size" {
   default     = "Standard_B1s"
 }
 
-variable "admin_username" {
-  description = "Nome de usuário administrador para login SSH na VM."
-  type        = string
-  default     = "azureuser"
-}
+
