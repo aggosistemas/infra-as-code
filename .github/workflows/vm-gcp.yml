@@ -1,4 +1,4 @@
-name: Provisionar VM GCP com Backend S3
+name: Provisionar VM Google Cloud
 
 on:
   workflow_dispatch:
