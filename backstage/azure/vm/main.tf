@@ -56,7 +56,6 @@ admin_ssh_key {
   public_key = file("${path.module}/chave-ssh.pub")
 }
 
-
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"

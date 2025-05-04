@@ -57,9 +57,3 @@ variable "admin_username" {
   type        = string
   default     = "ubuntu"
 }
-
-variable "ssh_public_key_path" {
-  description = "Caminho local para o arquivo da chave pública SSH (.pub)."
-  type        = string
-  default     = "${path.module}/chave-ssh.pub"
-}
