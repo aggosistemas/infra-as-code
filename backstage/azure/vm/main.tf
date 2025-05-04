@@ -51,10 +51,11 @@ resource "azurerm_linux_virtual_machine" "vm" {
     azurerm_network_interface.nic.id,
   ]
   
-  admin_ssh_key {
-    username   = var.admin_username
-    public_key = file(var.ssh_public_key)
-  }
+admin_ssh_key {
+  username   = var.admin_username
+  public_key = file("${path.module}/chave-ssh.pub")
+}
+
 
   os_disk {
     caching              = "ReadWrite"

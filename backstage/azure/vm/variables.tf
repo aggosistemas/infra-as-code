@@ -52,4 +52,14 @@ variable "vm_size" {
   default     = "Standard_B1s"
 }
 
+variable "admin_username" {
+  description = "Nome do usuário administrador da VM."
+  type        = string
+  default     = "ubuntu"
+}
 
+variable "ssh_public_key_path" {
+  description = "Caminho local para o arquivo da chave pública SSH (.pub)."
+  type        = string
+  default     = "${path.module}/chave-ssh.pub"
+}
