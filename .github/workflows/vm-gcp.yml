@@ -1,10 +1,10 @@
-name: Provisionar VM GCP
+name: Provisionar VM GCP com Backend S3
 
 on:
   workflow_dispatch:
     inputs:
       action:
-        description: "Escolha a ação a ser executada: apply ou destroy"
+        description: "Ação do Terraform (apply/destroy)"
         required: true
         default: "apply"
         type: choice
@@ -16,48 +16,45 @@ jobs:
   terraform:
     name: Executar Terraform
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     env:
       TF_WORKING_DIR: backstage/gcp/vm-gcp
-      GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-key.json
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
 
     steps:
       - name: Checkout do código
         uses: actions/checkout@v3
+
+      - name: Configurar credenciais AWS (para backend S3)
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          ref: ${{ github.ref_name }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}  # Mesma região do bucket S3
 
-      - name: Configurar chave GCP
-        run: |
-          echo '${{ secrets.GCP_SA_KEY }}' > $GOOGLE_APPLICATION_CREDENTIALS
+      - name: Configurar autenticação GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Instalar Terraform
+      - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
+          terraform_wrapper: false
 
       - name: Inicializar Terraform
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform init
+        run: terraform init -input=false
 
-      - name: Executar Terraform Plan
-        if: ${{ github.event.inputs.action == 'apply' }}
+      - name: Executar ação do Terraform
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform plan
-
-      - name: Aplicar Terraform (Apply)
-        if: ${{ github.event.inputs.action == 'apply' }}
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -auto-approve
-
-      - name: Destruir Infraestrutura (Destroy)
-        if: ${{ github.event.inputs.action == 'destroy' }}
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform destroy -auto-approve
-
-      - name: Exibir Outputs do Terraform
-        if: ${{ github.event.inputs.action == 'apply' }}
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform output
+        run: |
+          if [ "${{ github.event.inputs.action }}" == "apply" ]; then
+            terraform plan -input=false
+            terraform apply -auto-approve -input=false
+          else
+            terraform destroy -auto-approve -input=false
+          fi
