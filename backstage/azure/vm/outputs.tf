@@ -1,17 +1,14 @@
-# Output do IP público da VM
 output "public_ip_address" {
-  description = "O endereço IP público da máquina virtual."
+  description = "Endereço IP público alocado para a VM"
   value       = azurerm_public_ip.public_ip.ip_address
 }
 
-# Output do nome da máquina virtual
 output "vm_name" {
-  description = "O nome da máquina virtual provisionada."
+  description = "Nome da máquina virtual provisionada"
   value       = azurerm_linux_virtual_machine.vm.name
 }
 
-# Output do ID da máquina virtual
 output "vm_id" {
-  description = "O ID da máquina virtual provisionada."
+  description = "ID completo da VM"
   value       = azurerm_linux_virtual_machine.vm.id
 }
