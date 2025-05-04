@@ -44,7 +44,7 @@ jobs:
 
       - name: Inicializar Terraform
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform init -input=false -no-color
+        run: terraform init -reconfigure -input=false -no-color
 
       - name: Validar Terraform
         working-directory: ${{ env.TF_WORKING_DIR }}
