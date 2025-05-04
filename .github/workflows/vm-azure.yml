@@ -1,4 +1,4 @@
-name: Terraform VM Provisioning
+name: Terraform Azure VM
 
 on:
   workflow_dispatch:
@@ -14,21 +14,21 @@ on:
 
 jobs:
   terraform:
-    name: Terraform Azure VM
+    name: Provisionar VM na Azure
     runs-on: ubuntu-latest
 
     env:
       TF_WORKING_DIR: backstage/azure/vm
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
 
     steps:
-      - name: Checkout do código
+      - name: Checkout do repositório
         uses: actions/checkout@v4
 
       - name: Instalar Terraform
@@ -40,16 +40,20 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init -input=false -no-color
 
-      - name: Validar Terraform
+      - name: Validar configuração
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate -no-color
 
-      - name: Aplicar recursos Terraform (apply)
+      - name: Aplicar (apply)
         if: ${{ github.event.inputs.action == 'apply' }}
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -input=false -no-color -auto-approve
+        run: |
+          terraform apply -auto-approve -input=false -no-color \
+            -var="admin_password=${{ secrets.ADMIN_PASSWORD }}"
 
-      - name: Destruir recursos Terraform (destroy)
+      - name: Destruir (destroy)
         if: ${{ github.event.inputs.action == 'destroy' }}
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform destroy -input=false -no-color -auto-approve
+        run: |
+          terraform destroy -auto-approve -input=false -no-color \
+            -var="admin_password=${{ secrets.ADMIN_PASSWORD }}"
