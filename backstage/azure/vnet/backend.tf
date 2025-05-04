@@ -4,6 +4,6 @@ terraform {
     key            = "terraform/state/vnet-azure-pipe.tfstate"
     region         = "ca-central-1"
     encrypt        = true
-    dynamodb_table = "terraform-lock-table"
+
   }
 }
