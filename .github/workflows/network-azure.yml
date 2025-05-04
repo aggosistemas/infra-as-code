@@ -1,4 +1,4 @@
-name: Terraform VM Provisioning
+name: Terraform Network Provisioning
 
 on:
   workflow_dispatch:
