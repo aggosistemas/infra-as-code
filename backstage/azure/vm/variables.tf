@@ -1,7 +1,7 @@
 variable "resource_group_name" {
   description = "Nome do Resource Group onde a VM será criada."
   type        = string
-  default     = "networksg-projeto-vm"
+  default     = "resourcegroup-pequistore"
 }
 
 variable "location" {
