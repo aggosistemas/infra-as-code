@@ -68,7 +68,7 @@ jobs:
         run: |
           mkdir -p output
           echo "$(terraform output -raw public_ip_address)" > output/ip-publico.txt
-          cp ../ssh_keys/chave-ssh output/chave-privada.pem
+          cp $GITHUB_WORKSPACE/ssh_keys/chave-ssh output/chave-privada.pem
 
       - name: Compactar arquivos em ZIP (somente em apply)
         if: ${{ github.event.inputs.action == 'apply' }}
