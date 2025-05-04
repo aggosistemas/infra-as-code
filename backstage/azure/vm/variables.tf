@@ -57,14 +57,3 @@ variable "admin_username" {
   type        = string
   default     = "azureuser"
 }
-
-variable "ssh_key_name" {
-  description = "Nome do arquivo da chave SSH pública (sem extensão .pub)."
-  type        = string
-  default     = "ssh-key-pequi"
-}
-
-variable "ssh_public_key" {
-  description = "Conteúdo da chave pública SSH que será inserida na VM"
-  type        = string
-}
