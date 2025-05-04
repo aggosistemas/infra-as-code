@@ -14,7 +14,7 @@ on:
 
 jobs:
   terraform:
-    name: Terraform VM
+    name: Terraform Network
     runs-on: ubuntu-latest
 
     env:
