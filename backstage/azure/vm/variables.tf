@@ -1,7 +1,7 @@
 variable "resource_group_name" {
   description = "Nome do Resource Group onde a VM será criada."
   type        = string
-  default     = "rg-pequistore"
+  default     = "networksg-projeto-vm"
 }
 
 variable "location" {
@@ -13,25 +13,25 @@ variable "location" {
 variable "vnet_name" {
   description = "Nome da Virtual Network existente."
   type        = string
-  default     = "vnet-pequistore"
+  default     = "virtuanlnet-pequistore"
 }
 
 variable "subnet_name" {
   description = "Nome da Subnet existente."
   type        = string
-  default     = "subnet-pequistore"
+  default     = "subnet-priv-pequistore"
 }
 
 variable "nsg_name" {
   description = "Nome do Network Security Group existente."
   type        = string
-  default     = "nsg-projeto-vm"
+  default     = "networksg-projeto-vm"
 }
 
 variable "public_ip_name" {
   description = "Nome do recurso de IP Público a ser criado."
   type        = string
-  default     = "public-ip-pequi"
+  default     = "subnet-priv-pequistore"
 }
 
 variable "nic_name" {
