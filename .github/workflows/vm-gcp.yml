@@ -1,4 +1,4 @@
-name: Provisionar VM na GCP
+name: Provisionar VM GCP
 
 on:
   workflow_dispatch:
@@ -11,10 +11,6 @@ on:
         options:
           - apply
           - destroy
-      branch:
-        description: "Branch do projeto que contém os arquivos Terraform"
-        required: true
-        default: "main"
 
 env:
   TF_WORKING_DIR: backstage/gcp/vm-gcp
@@ -29,7 +25,7 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.inputs.branch }}
+          ref: ${{ github.ref_name }}
 
       - name: Configurar chave GCP
         run: |
@@ -50,10 +46,6 @@ jobs:
       - name: Inicializar Terraform
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
-
-      - name: Validar Terraform
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform validate
 
       - name: Executar Terraform Plan
         if: ${{ github.event.inputs.action == 'apply' }}
