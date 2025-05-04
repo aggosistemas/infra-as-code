@@ -1,4 +1,4 @@
-name: Provisionar VM GCP
+name: Provisionar VM na GCP
 
 on:
   workflow_dispatch:
