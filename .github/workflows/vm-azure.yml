@@ -51,9 +51,9 @@ jobs:
           terraform apply -auto-approve -input=false -no-color \
             -var="admin_password=${{ secrets.ADMIN_PASSWORD }}"
 
-      - name: Aguardar propagação do IP (sleep 20s)
+      - name: Aguardar propagação do IP (sleep 50s)
         if: ${{ github.event.inputs.action == 'apply' }}
-        run: sleep 20
+        run: sleep 50
 
       - name: Mostrar outputs (após apply)
         if: ${{ github.event.inputs.action == 'apply' }}
