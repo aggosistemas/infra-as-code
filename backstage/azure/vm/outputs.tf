@@ -1,55 +1,17 @@
-name: Terraform VM Provisioning (Simplificado)
+# Output do IP público da VM
+output "public_ip_address" {
+  description = "O endereço IP público da máquina virtual."
+  value       = azurerm_public_ip.public_ip.ip_address
+}
 
-on:
-  workflow_dispatch:
-    inputs:
-      action:
-        description: "Escolha a ação: apply (criar) ou destroy (remover)"
-        required: true
-        default: "apply"
-        type: choice
-        options:
-          - apply
-          - destroy
+# Output do nome da máquina virtual
+output "vm_name" {
+  description = "O nome da máquina virtual provisionada."
+  value       = azurerm_linux_virtual_machine.vm.name
+}
 
-jobs:
-  terraform:
-    name: Terraform Azure VM
-    runs-on: ubuntu-latest
-
-    env:
-      TF_WORKING_DIR: backstage/azure/vm
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-
-    steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
-
-      - name: Instalar Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.6.6
-
-      - name: Inicializar Terraform
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform init -input=false -no-color
-
-      - name: Validar Terraform
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform validate -no-color
-
-      - name: Aplicar recursos Terraform (apply)
-        if: ${{ github.event.inputs.action == 'apply' }}
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -input=false -no-color -auto-approve
-
-      - name: Destruir recursos Terraform (destroy)
-        if: ${{ github.event.inputs.action == 'destroy' }}
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform destroy -input=false -no-color -auto-approve
+# Output do ID da máquina virtual
+output "vm_id" {
+  description = "O ID da máquina virtual provisionada."
+  value       = azurerm_linux_virtual_machine.vm.id
+}

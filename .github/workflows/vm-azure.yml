@@ -1,10 +1,10 @@
-name: Terraform VM Provisioning
+name: Terraform VM Provisioning (Simplificado)
 
 on:
   workflow_dispatch:
     inputs:
       action:
-        description: "Escolha a ação: apply (provisionar) ou destroy (remover)"
+        description: "Escolha a ação: apply (criar) ou destroy (remover)"
         required: true
         default: "apply"
         type: choice
@@ -14,7 +14,7 @@ on:
 
 jobs:
   terraform:
-    name: Terraform VM
+    name: Terraform Azure VM
     runs-on: ubuntu-latest
 
     env:
@@ -36,50 +36,20 @@ jobs:
         with:
           terraform_version: 1.6.6
 
-      - name: Gerar chave SSH (somente em apply)
-        if: ${{ github.event.inputs.action == 'apply' }}
-        run: |
-          mkdir -p ssh_keys
-          ssh-keygen -t rsa -b 4096 -f ssh_keys/chave-ssh -q -N ""
-
       - name: Inicializar Terraform
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform init -reconfigure -input=false -no-color
+        run: terraform init -input=false -no-color
 
       - name: Validar Terraform
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate -no-color
 
-      - name: Aplicar recursos Terraform
+      - name: Aplicar recursos Terraform (apply)
         if: ${{ github.event.inputs.action == 'apply' }}
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          terraform apply -input=false -no-color -auto-approve \
-            -var="ssh_public_key=${{ github.workspace }}/ssh_keys/chave-ssh.pub"
+        run: terraform apply -input=false -no-color -auto-approve
 
-      - name: Destruir recursos Terraform
+      - name: Destruir recursos Terraform (destroy)
         if: ${{ github.event.inputs.action == 'destroy' }}
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform destroy -input=false -no-color -auto-approve
-
-      - name: Coletar IP público e salvar arquivos (somente em apply)
-        if: ${{ github.event.inputs.action == 'apply' }}
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          mkdir -p output
-          echo "$(terraform output -raw public_ip_address)" > output/ip-publico.txt
-          cp $GITHUB_WORKSPACE/ssh_keys/chave-ssh output/chave-privada.pem
-
-      - name: Compactar arquivos em ZIP (somente em apply)
-        if: ${{ github.event.inputs.action == 'apply' }}
-        run: |
-          cd output
-          zip vm-access-info.zip chave-privada.pem ip-publico.txt
-
-      - name: Upload Artifact (somente em apply)
-        if: ${{ github.event.inputs.action == 'apply' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: vm-access-info
-          path: output/vm-access-info.zip
-          retention-days: 1
