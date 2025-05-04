@@ -1,6 +1,7 @@
 variable "project_id" {
   description = "ID do projeto GCP"
   type        = string
+  default     = "vm-projeto-tf"
 }
 
 variable "region" {
