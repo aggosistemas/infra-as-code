@@ -1,7 +1,7 @@
 variable "resource_group_name" {
   description = "Nome do Resource Group a ser criado."
   type        = string
-  default     = "rg-pequistore"
+  default     = "resourcegroup-pequistore"
 }
 
 variable "location" {
@@ -13,7 +13,7 @@ variable "location" {
 variable "vnet_name" {
   description = "Nome da Virtual Network (VNet) a ser criada."
   type        = string
-  default     = "vnet-pequistore"
+  default     = "virtuanlnet-pequistore"
 }
 
 variable "vnet_address_space" {
@@ -25,7 +25,7 @@ variable "vnet_address_space" {
 variable "subnet_name" {
   description = "Nome da Subnet a ser criada dentro da VNet."
   type        = string
-  default     = "subnet-pequistore"
+  default     = "subnet-priv-pequistore"
 }
 
 variable "subnet_address_prefix" {
@@ -37,5 +37,5 @@ variable "subnet_address_prefix" {
 variable "nsg_name" {
   description = "Nome do Network Security Group (NSG) a ser criado."
   type        = string
-  default     = "nsg-projeto-vm"
+  default     = "networksg-projeto-vm"
 }
