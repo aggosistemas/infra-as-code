@@ -20,7 +20,11 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes     = [var.subnet_address_prefix]
 }
 
-# Criar o Network Security Group (NSG)
+# Consulta ao resource group existente
+data "azurerm_resource_group" "rg" {
+  name = var.resource_group_name
+}
+
 resource "azurerm_network_security_group" "nsg" {
   name                = var.nsg_name
   location            = data.azurerm_resource_group.rg.location
@@ -50,6 +54,7 @@ resource "azurerm_network_security_group" "nsg" {
     destination_address_prefix = "*"
   }
 }
+
 
 # Associar o NSG à Subnet
 resource "azurerm_subnet_network_security_group_association" "subnet_nsg" {
