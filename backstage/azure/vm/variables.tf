@@ -13,7 +13,7 @@ variable "location" {
 variable "vnet_name" {
   description = "Nome da Virtual Network existente."
   type        = string
-  default     = "virtuanlnet-pequistore"
+  default     = "virtualnet-pequistore"
 }
 
 variable "subnet_name" {
@@ -22,10 +22,22 @@ variable "subnet_name" {
   default     = "subnet-priv-pequistore"
 }
 
+variable "subnet_id" {
+  description = "ID da Subnet existente."
+  type        = string
+  default     = "/subscriptions/***/resourceGroups/resourcegroup-pequistore/providers/Microsoft.Network/virtualNetworks/virtualnet-pequistore/subnets/subnet-priv-pequistore"
+}
+
 variable "nsg_name" {
   description = "Nome do Network Security Group existente."
   type        = string
   default     = "networksg-projeto-vm"
+}
+
+variable "nsg_id" {
+  description = "ID do Network Security Group existente."
+  type        = string
+  default     = "/subscriptions/***/resourceGroups/resourcegroup-pequistore/providers/Microsoft.Network/networkSecurityGroups/networksg-projeto-vm"
 }
 
 variable "public_ip_name" {
