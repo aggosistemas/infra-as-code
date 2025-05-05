@@ -1,3 +1,4 @@
+
 variable "resource_group_name" {
   description = "Nome do Resource Group a ser criado."
   type        = string
@@ -13,7 +14,7 @@ variable "location" {
 variable "vnet_name" {
   description = "Nome da Virtual Network (VNet) a ser criada."
   type        = string
-  default     = "virtuanlnet-pequistore"
+  default     = "virtualnet-pequistore"
 }
 
 variable "vnet_address_space" {

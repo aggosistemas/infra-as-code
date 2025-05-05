@@ -21,3 +21,13 @@ output "nsg_name" {
   description = "Nome do Network Security Group criado."
   value       = azurerm_network_security_group.nsg.name
 }
+
+output "subnet_id" {
+  description = "ID da Subnet criada"
+  value       = azurerm_subnet.subnet.id
+}
+
+output "nsg_id" {
+  description = "ID do Network Security Group criado"
+  value       = azurerm_network_security_group.nsg.id
+}
