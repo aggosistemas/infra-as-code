@@ -1,10 +1,10 @@
-name: Terraform VM Provisioning
+name: Terraform Azure VM
 
 on:
   workflow_dispatch:
     inputs:
       action:
-        description: "Escolha a ação: apply (provisionar) ou destroy (remover)"
+        description: "Escolha a ação: apply (criar) ou destroy (remover)"
         required: true
         default: "apply"
         type: choice
@@ -14,21 +14,21 @@ on:
 
 jobs:
   terraform:
-    name: Terraform VM
+    name: Provisionar VM na Azure
     runs-on: ubuntu-latest
 
     env:
       TF_WORKING_DIR: backstage/azure/vm
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
 
     steps:
-      - name: Checkout do código
+      - name: Checkout do repositório
         uses: actions/checkout@v4
 
       - name: Instalar Terraform
@@ -36,50 +36,33 @@ jobs:
         with:
           terraform_version: 1.6.6
 
-      - name: Gerar chave SSH (somente em apply)
-        if: ${{ github.event.inputs.action == 'apply' }}
-        run: |
-          mkdir -p ssh_keys
-          ssh-keygen -t rsa -b 4096 -f ssh_keys/chave-ssh -q -N ""
-
       - name: Inicializar Terraform
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform init -reconfigure -input=false -no-color
+        run: terraform init -input=false -no-color
 
-      - name: Validar Terraform
+      - name: Validar configuração
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate -no-color
 
-      - name: Aplicar recursos Terraform
+      - name: Aplicar (apply)
         if: ${{ github.event.inputs.action == 'apply' }}
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          terraform apply -input=false -no-color -auto-approve \
-            -var="ssh_public_key=${{ github.workspace }}/ssh_keys/chave-ssh.pub"
+          terraform apply -auto-approve -input=false -no-color \
+            -var="admin_password=${{ secrets.ADMIN_PASSWORD }}"
 
-      - name: Destruir recursos Terraform
+      - name: Aguardar propagação do IP (sleep 2 min)
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: sleep 120
+
+      - name: Mostrar outputs (após apply)
+        if: ${{ github.event.inputs.action == 'apply' }}
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform output
+
+      - name: Destruir (destroy)
         if: ${{ github.event.inputs.action == 'destroy' }}
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform destroy -input=false -no-color -auto-approve
-
-      - name: Coletar IP público e salvar arquivos (somente em apply)
-        if: ${{ github.event.inputs.action == 'apply' }}
-        working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          mkdir -p output
-          echo "$(terraform output -raw public_ip_address)" > output/ip-publico.txt
-          cp ../ssh_keys/chave-ssh output/chave-privada.pem
-
-      - name: Compactar arquivos em ZIP (somente em apply)
-        if: ${{ github.event.inputs.action == 'apply' }}
-        run: |
-          cd output
-          zip vm-access-info.zip chave-privada.pem ip-publico.txt
-
-      - name: Upload Artifact (somente em apply)
-        if: ${{ github.event.inputs.action == 'apply' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: vm-access-info
-          path: output/vm-access-info.zip
-          retention-days: 1
+          terraform destroy -auto-approve -input=false -no-color \
+            -var="admin_password=${{ secrets.ADMIN_PASSWORD }}"

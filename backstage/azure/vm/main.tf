@@ -1,32 +1,26 @@
-# Buscar o Resource Group existente
 data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 }
 
-# Buscar a Virtual Network existente
 data "azurerm_virtual_network" "vnet" {
   name                = var.vnet_name
   resource_group_name = data.azurerm_resource_group.rg.name
 }
 
-# Buscar a Subnet existente
 data "azurerm_subnet" "subnet" {
   name                 = var.subnet_name
   virtual_network_name = data.azurerm_virtual_network.vnet.name
   resource_group_name  = data.azurerm_resource_group.rg.name
 }
 
-# Criar o IP público
 resource "azurerm_public_ip" "public_ip" {
   name                = var.public_ip_name
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Dynamic"
-
-  sku = "Basic"
+  sku                 = "Basic"
 }
 
-# Criar a Interface de Rede (NIC)
 resource "azurerm_network_interface" "nic" {
   name                = var.nic_name
   location            = data.azurerm_resource_group.rg.location
@@ -40,32 +34,32 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
-# Criar a Máquina Virtual Ubuntu
 resource "azurerm_linux_virtual_machine" "vm" {
-  name                = var.vm_name
-  resource_group_name = data.azurerm_resource_group.rg.name
-  location            = data.azurerm_resource_group.rg.location
-  size                = var.vm_size
-  admin_username      = var.admin_username
+  name                  = var.vm_name
+  resource_group_name   = data.azurerm_resource_group.rg.name
+  location              = data.azurerm_resource_group.rg.location
+  size                  = var.vm_size
+  admin_username        = var.admin_username
+  admin_password        = var.admin_password
+  disable_password_authentication = false
+
   network_interface_ids = [
     azurerm_network_interface.nic.id,
   ]
-  
-  admin_ssh_key {
-    username   = var.admin_username
-    public_key = file(var.ssh_public_key)
-  }
 
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
 
-source_image_reference {
-  publisher = local.vm_image.publisher
-  offer     = local.vm_image.offer
-  sku       = local.vm_image.sku
-  version   = local.vm_image.version
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
+  }
+
+  depends_on = [azurerm_public_ip.public_ip]
 }
 
-}
+

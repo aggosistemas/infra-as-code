@@ -1,7 +1,7 @@
 variable "resource_group_name" {
   description = "Nome do Resource Group onde a VM será criada."
   type        = string
-  default     = "rg-pequistore"
+  default     = "resourcegroup-pequistore"
 }
 
 variable "location" {
@@ -13,25 +13,37 @@ variable "location" {
 variable "vnet_name" {
   description = "Nome da Virtual Network existente."
   type        = string
-  default     = "vnet-pequistore"
+  default     = "virtualnet-pequistore"
 }
 
 variable "subnet_name" {
   description = "Nome da Subnet existente."
   type        = string
-  default     = "subnet-pequistore"
+  default     = "subnet-priv-pequistore"
+}
+
+variable "subnet_id" {
+  description = "ID da Subnet existente."
+  type        = string
+  default     = "/subscriptions/***/resourceGroups/resourcegroup-pequistore/providers/Microsoft.Network/virtualNetworks/virtualnet-pequistore/subnets/subnet-priv-pequistore"
 }
 
 variable "nsg_name" {
   description = "Nome do Network Security Group existente."
   type        = string
-  default     = "nsg-projeto-vm"
+  default     = "networksg-projeto-vm"
+}
+
+variable "nsg_id" {
+  description = "ID do Network Security Group existente."
+  type        = string
+  default     = "/subscriptions/***/resourceGroups/resourcegroup-pequistore/providers/Microsoft.Network/networkSecurityGroups/networksg-projeto-vm"
 }
 
 variable "public_ip_name" {
   description = "Nome do recurso de IP Público a ser criado."
   type        = string
-  default     = "public-ip-pequi"
+  default     = "subnet-priv-pequistore"
 }
 
 variable "nic_name" {
@@ -53,18 +65,13 @@ variable "vm_size" {
 }
 
 variable "admin_username" {
-  description = "Nome de usuário administrador para login SSH na VM."
+  description = "Nome do usuário administrador da VM."
   type        = string
-  default     = "azureuser"
+  default     = "ubuntu"
 }
 
-variable "ssh_key_name" {
-  description = "Nome do arquivo da chave SSH pública (sem extensão .pub)."
+variable "admin_password" {
+  description = "Senha do usuário administrador da VM."
   type        = string
-  default     = "ssh-key-pequi"
-}
-
-variable "ssh_public_key" {
-  description = "Conteúdo da chave pública SSH que será inserida na VM"
-  type        = string
+  sensitive   = true
 }
