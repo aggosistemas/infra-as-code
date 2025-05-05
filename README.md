@@ -1,6 +1,45 @@
 
 # Provisionamento de Infraestrutura na Azure com Terraform e GitHub Actions
 
+## 🔑 Primeiros Passos na Azure
+
+Para utilizar este projeto, você precisa de uma conta na Azure e configurar as credenciais de automação.
+
+### 1. Criar uma conta gratuita
+- Acesse: [https://azure.microsoft.com/pt-br/free](https://azure.microsoft.com/pt-br/free)
+- Crie uma conta com seu e-mail e cartão de crédito (sem cobranças no início).
+- Após o cadastro, entre em [https://portal.azure.com](https://portal.azure.com)
+
+### 2. Registrar um aplicativo (App Registration)
+- Vá em **Azure Active Directory** > **Registros de Aplicativos**.
+- Clique em **Novo registro**.
+- Nomeie como `terraform-automation` e clique em **Registrar**.
+
+### 3. Obtenha os dados abaixo:
+- `Application (client) ID`
+- `Directory (tenant) ID`
+
+### 4. Criar um segredo (Client Secret)
+- Vá em **Certificados e segredos** > **Novo segredo de cliente**
+- Defina uma validade e copie o valor gerado imediatamente.
+
+### 5. Conceder permissões (IAM)
+- Vá em **Assinaturas** > selecione a sua assinatura
+- Clique em **Controle de Acesso (IAM)** > **Adicionar função**
+- Selecione a função **Contribuidor**
+- Atribua ao aplicativo `terraform-automation`
+
+### 6. Instalar o Azure CLI localmente (opcional)
+```bash
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+az login
+az account show
+```
+
+---
+
+
+
 Este projeto automatiza a criação de **redes** e **máquinas virtuais (VMs)** na Azure utilizando **Terraform** e **GitHub Actions**.
 
 Ele foi estruturado para ajudar analistas, mesmo com pouca experiência, a realizarem a automação de forma guiada e segura.
