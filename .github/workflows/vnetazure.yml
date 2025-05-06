@@ -15,7 +15,6 @@ on:
 jobs:
   terraform:
     name: Terraform Azure Network
-    name: Terraform Network
     runs-on: ubuntu-latest
 
     env:
