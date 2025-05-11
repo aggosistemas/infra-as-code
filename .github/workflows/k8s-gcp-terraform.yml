@@ -22,7 +22,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: infra-as-code/backstage/gcp/kubernetes/
+        working-directory: backstage/gcp/kubernetes/
 
     steps:
       - name: Checkout do repositório
