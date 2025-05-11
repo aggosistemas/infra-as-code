@@ -11,6 +11,10 @@ on:
         options:
           - apply
           - destroy
+      branch:
+        description: "Branch do repositório a ser usada"
+        required: true
+        default: "main"
 
 jobs:
   terraform:
@@ -23,13 +27,14 @@ jobs:
     steps:
       - name: Checkout do repositório
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
 
       - name: Configurar credenciais AWS para backend S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          echo "Credenciais AWS configuradas"
+        run: echo "Credenciais AWS configuradas"
 
       - name: Autenticar na GCP
         uses: google-github-actions/auth@v1
