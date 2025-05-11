@@ -1,4 +1,4 @@
-name: GCP Kubernetes Terraform v1
+name: GCP Kubernetes Terraform
 
 on:
   workflow_dispatch:
