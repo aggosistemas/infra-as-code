@@ -1,60 +1,65 @@
 variable "table_name" {
   description = "Nome da tabela DynamoDB"
   type        = string
+  default     = "RegrasNegocio"
 }
 
 variable "hash_key" {
-  description = "Atributo usado como chave de partição (hash key)"
-  type        = string
+  description = "Chave primária (partition key) da tabela"
+  type = object({
+    name = string
+    type = string
+  })
+  default = {
+    name = "id"
+    type = "S"
+  }
 }
 
-variable "range_key" {
-  description = "Atributo usado como range key (opcional)"
-  type        = string
-  default     = null
+variable "global_secondary_indexes" {
+  description = "Lista de índices GSI a serem criados"
+  type = list(object({
+    name            = string
+    hash_key        = object({
+      name = string
+      type = string
+    })
+    projection_type = string
+    read_capacity   = number
+    write_capacity  = number
+  }))
+  default = [
+    {
+      name = "status-index"
+      hash_key = {
+        name = "status"
+        type = "S"
+      }
+      projection_type = "ALL"
+      read_capacity   = 5
+      write_capacity  = 5
+    }
+  ]
 }
 
 variable "read_capacity" {
-  description = "Capacidade de leitura"
+  description = "Capacidade de leitura provisionada"
   type        = number
   default     = 5
 }
 
 variable "write_capacity" {
-  description = "Capacidade de escrita"
+  description = "Capacidade de escrita provisionada"
   type        = number
   default     = 5
 }
 
-variable "attribute_definitions" {
-  description = "Lista de atributos com nome e tipo (S, N ou B)"
-  type = list(object({
-    name = string
-    type = string
-  }))
-}
-
-variable "local_secondary_indexes" {
-  description = "Lista de LSI (opcional)"
-  type = list(object({
-    name               = string
-    range_key          = string
-    projection_type    = string
-    non_key_attributes = optional(list(string))
-  }))
-  default = []
-}
-
-variable "global_secondary_indexes" {
-  description = "Lista de GSI (opcional)"
-  type = list(object({
-    name               = string
-    hash_key           = string
-    range_key          = optional(string)
-    read_capacity      = number
-    write_capacity     = number
-    projection_type    = string
-    non_key_attributes = optional(list(string))
-  }))
-  default = []
+variable "tags" {
+  description = "Tags aplicadas à tabela"
+  type        = map(string)
+  default = {
+    Projeto     = "CadastroRegras"
+    Responsavel = "EquipeNegocio"
+    Ambiente    = "dev"
+  }
 }
