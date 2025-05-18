@@ -23,6 +23,7 @@ jobs:
 
     steps:
       - name: Checkout código
+        TF_WORKING_DIR: backstage/dynamoDB/
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.branch }}
