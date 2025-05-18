@@ -1,4 +1,4 @@
-name: Terraform Provisionamento DynamoDB
+name: Provisionar Tabela DynamoDB
 
 on:
   workflow_dispatch:
@@ -18,12 +18,15 @@ on:
 
 jobs:
   terraform:
-    name: Executar Terraform
+    name: Executar Terraform DynamoDB
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: backstage/dynamoDB
+
     steps:
-      - name: Checkout código
-        TF_WORKING_DIR: backstage/dynamoDB/
+      - name: Checkout do código
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.branch }}
@@ -46,10 +49,10 @@ jobs:
       - name: Validar Terraform
         run: terraform validate
 
-      - name: Executar terraform plan
+      - name: Executar Terraform Plan
         run: terraform plan -input=false
 
-      - name: Aplicar ou destruir com Terraform
+      - name: Executar Apply ou Destroy
         run: |
           if [ "${{ github.event.inputs.action }}" = "apply" ]; then
             terraform apply -auto-approve
