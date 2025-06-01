@@ -36,9 +36,3 @@ resource "google_container_node_pool" "primary_nodes" {
   initial_node_count = 1
 }
 
-# Concede ao usuário aggosistemas@gmail.com permissões de visualização e gerenciamento no GKE
-resource "google_project_iam_member" "aggosistemas_gke_access" {
-  project = var.project_id
-  role    = "roles/container.developer"
-  member  = "user:aggosistemas@gmail.com"
-}
