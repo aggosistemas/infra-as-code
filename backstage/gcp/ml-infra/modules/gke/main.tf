@@ -25,7 +25,7 @@ resource "google_container_node_pool" "primary_nodes" {
 
   node_config {
     preemptible     = true
-    machine_type    = "e2-micro"
+    machine_type    = "e2-medium"
     service_account = var.gke_sa_email
 
     oauth_scopes = [
@@ -33,7 +33,7 @@ resource "google_container_node_pool" "primary_nodes" {
     ]
   }
 
-  initial_node_count = 1
+  initial_node_count = 2
 }
 
 # Concede ao usuário aggosistemas@gmail.com permissões de visualização e gerenciamento no GKE
@@ -42,3 +42,4 @@ resource "google_project_iam_member" "aggosistemas_gke_access" {
   role    = "roles/container.developer"
   member  = "user:aggosistemas@gmail.com"
 }
+
