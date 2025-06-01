@@ -25,7 +25,7 @@ resource "google_container_node_pool" "primary_nodes" {
 
   node_config {
     preemptible     = true
-    machine_type    = "e2-medium"
+    machine_type    = "e2-micro"
     service_account = var.gke_sa_email
 
     oauth_scopes = [
