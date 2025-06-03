@@ -13,5 +13,5 @@ variable "region" {
 variable "cluster_name" {
   description = "Nome do cluster GKE"
   type        = string
-  default     = "cluster-machine-learning"
+  default     = "cluster-kubernetes-padrao"
 }
