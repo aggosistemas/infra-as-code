@@ -99,4 +99,3 @@ jobs:
         \"stack_hash\": \"${STACK_HASH}\",
         \"timestamp\": \"${TS}\"
       }"
-
