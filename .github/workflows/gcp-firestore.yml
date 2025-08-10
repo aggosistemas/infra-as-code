@@ -59,18 +59,44 @@ jobs:
         working-directory: backstage/gcp/firestore
         run: terraform destroy -auto-approve -var="gcp_project_id=${{ env.GOOGLE_PROJECT }}" -var="gcp_region=us-central1"
 
-      - name: Send log to InfluxDB via Fluent Bit
-        if: always() # Garante execução mesmo se o job falhar
-        run: |
-          curl --location '${{ secrets.FLUENT_BIT_URL }}' \
-          --header 'Content-Type: application/json' \
-          --header 'Authorization: Basic ${{ secrets.FLUENT_BIT_AUTH_BA }}' \
-          --data "{
-            \"service\": \"github-actions\",
-            \"workflow\": \"lambda-provisioning\",
-            \"job\": \"terraform-${{ inputs.action }}\",
-            \"status\": \"${{ job.status }}\",
-            \"branch\": \"${GITHUB_REF_NAME}\",
-            \"autor\": \"${GITHUB_ACTOR}\",
-            \"timestamp\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"
-          }"
+- name: Send log to Fluent Bit (GitHub Actions)
+  if: always()
+  env:
+    FLUENT_BIT_URL: ${{ secrets.FLUENT_BIT_URL }}         # ex: https://vps:9880/<endpoint>
+    FLUENT_BIT_AUTH_BA: ${{ secrets.FLUENT_BIT_AUTH_BA }} # Basic base64
+  run: |
+    REPO="${GITHUB_REPOSITORY}"                  # owner/name
+    WORKFLOW="${GITHUB_WORKFLOW}"
+    JOB="${GITHUB_JOB}"
+    BRANCH="${GITHUB_REF_NAME}"
+    SHA="${GITHUB_SHA}"
+    RUN_ID="${GITHUB_RUN_ID}"
+    STATUS="${{ job.status }}"                   # success|failure|cancelled
+    TS="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+    # tipo_erro: heurística simples pelo nome do job ou step (ajuste se quiser)
+    TIPO_ERRO=$( [ "$STATUS" = "failure" ] && echo "BUILD" || echo "INFO" )
+
+    # stack_hash: repo|workflow|job|status|sha[:8]
+    BASE="${REPO}|${WORKFLOW}|${JOB}|${STATUS}|${SHA:0:8}"
+    STACK_HASH=$(printf "%s" "$BASE" | shasum -a 256 | awk '{print $1}')
+
+    curl --location "$FLUENT_BIT_URL" \
+      --header 'Content-Type: application/json' \
+      --header "Authorization: Basic $FLUENT_BIT_AUTH_BA" \
+      --data "{
+        \"service\": \"github-actions\",
+        \"repo\": \"${REPO}\",
+        \"workflow\": \"${WORKFLOW}\",
+        \"job\": \"${JOB}\",
+        \"status\": \"${STATUS}\",
+        \"branch\": \"${BRANCH}\",
+        \"autor\": \"${GITHUB_ACTOR}\",
+        \"git_sha\": \"${SHA}\",
+        \"run_id\": \"${RUN_ID}\",
+        \"mensagem_curta\": \"Execução ${STATUS} em ${WORKFLOW}/${JOB}\",
+        \"tipo_erro\": \"${TIPO_ERRO}\",
+        \"stack_hash\": \"${STACK_HASH}\",
+        \"timestamp\": \"${TS}\"
+      }"
+
