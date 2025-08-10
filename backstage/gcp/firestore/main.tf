@@ -8,7 +8,7 @@ resource "google_project_service" "firestore" {
 }
 
 resource "google_firestore_database" "default" {
-  name     = "(default)"
+  name     = "agent-ia-active"
   project  = var.gcp_project_id
   location_id = var.gcp_region
   type     = "FIRESTORE_NATIVE"
