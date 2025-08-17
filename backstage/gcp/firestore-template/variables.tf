@@ -1,7 +1,7 @@
 variable "gcp_project_id" {
   description = "ID do projeto no GCP"
   type        = string
-  default     = "vm-projeto-tf"
+  default     = "project-ia-log-agent"
 }
 
 variable "gcp_region" {

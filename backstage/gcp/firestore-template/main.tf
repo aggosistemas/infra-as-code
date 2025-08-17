@@ -6,7 +6,7 @@ provider "google" {
 # Ativa a API do Firestore
 resource "google_project_service" "firestore" {
   service             = "firestore.googleapis.com"
-  disable_on_destroy  = false
+  disable_on_destroy  = true
 }
 
 # Cria o banco Firestore
@@ -15,6 +15,7 @@ resource "google_firestore_database" "default" {
   project     = var.gcp_project_id
   location_id = var.firestore_location
   type        = "FIRESTORE_NATIVE"
+  deletion_policy = "DELETE"   #garante que o destroy remove no GCP
 }
 
 # Configura o campo TTL para a coleção
@@ -23,6 +24,5 @@ resource "google_firestore_field" "logs_pipeline_ttl" {
   database   = google_firestore_database.default.name
   collection = var.firestore_collection
   field      = var.firestore_ttl_field
-
- 
 }
+
