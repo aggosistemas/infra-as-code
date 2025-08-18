@@ -38,25 +38,25 @@ jobs:
           terraform_version: "1.6.6"
 
       - name: Inicializar Terraform
-        working-directory: backstage/gcp/firestore
+        working-directory: backstage/gcp/firestore-template
         run: terraform init
 
       - name: Validar Terraform
-        working-directory: backstage/gcp/firestore
+        working-directory: backstage/gcp/firestore-template
         run: terraform validate
 
       - name: Executar Terraform Plan
-        working-directory: backstage/gcp/firestore
+        working-directory: backstage/gcp/firestore-template
         run: terraform plan -var="gcp_project_id=${{ env.GOOGLE_PROJECT }}" -var="gcp_region=us-central1"
 
       - name: Executar Terraform Apply ou Destroy
         if: github.event.inputs.action == 'apply'
-        working-directory: backstage/gcp/firestore
+        working-directory: backstage/gcp/firestore-template
         run: terraform apply -auto-approve -var="gcp_project_id=${{ env.GOOGLE_PROJECT }}" -var="gcp_region=us-central1"
 
       - name: Executar Terraform Destroy
         if: github.event.inputs.action == 'destroy'
-        working-directory: backstage/gcp/firestore
+        working-directory: backstage/gcp/firestore-template
         run: terraform destroy -auto-approve -var="gcp_project_id=${{ env.GOOGLE_PROJECT }}" -var="gcp_region=us-central1"
 
       - name: Enviar logs para Fluent Bit
