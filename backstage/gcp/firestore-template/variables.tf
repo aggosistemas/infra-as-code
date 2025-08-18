@@ -1,41 +1,40 @@
+# ID do projeto GCP
 variable "gcp_project_id" {
-  description = "ID do projeto no GCP"
+  description = "ID do projeto GCP"
   type        = string
-  default     = "project-ia-log-agent"
 }
 
+# Região usada pelos recursos (ex: us-central1 para Cloud Run)
 variable "gcp_region" {
-  description = "Região default usada pelo provider"
+  description = "Região principal usada para recursos regionais"
   type        = string
   default     = "us-central1"
 }
 
-variable "firestore_location" {
-  description = "Localização do Firestore (ex.: us-central)"
-  type        = string
-  default     = "us-central1"
-}
-
+# Firestore sempre usa (default)
 variable "firestore_database_id" {
-  description = "ID do banco Firestore. Use (default) para o banco padrão"
+  description = "Nome fixo do banco de dados Firestore"
   type        = string
-  default     = "template-backstage"
+  default     = "(default)"
 }
 
+# Localização do Firestore (precisa bater com a região do projeto)
+variable "firestore_location" {
+  description = "Localidade do Firestore"
+  type        = string
+  default     = "us-central"
+}
+
+# Nome da coleção padrão
 variable "firestore_collection" {
-  description = "Nome da coleção"
+  description = "Coleção do Firestore para logs"
   type        = string
-  default     = "logs_backstage"
+  default     = "logs_pipeline"
 }
 
+# Campo usado para TTL
 variable "firestore_ttl_field" {
-  description = "Campo de TTL para expiração dos documentos"
+  description = "Campo que controla a expiração dos documentos"
   type        = string
   default     = "ttl_hot"
-}
-
-variable "firestore_ttl_days" {
-  description = "Número de dias para o TTL"
-  type        = number
-  default     = 7
 }
