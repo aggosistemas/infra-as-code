@@ -19,13 +19,13 @@ variable "firestore_location" {
 variable "firestore_database_id" {
   description = "ID do banco Firestore. Use (default) para o banco padrão"
   type        = string
-  default     = "template-backstage"
+  default     = "logs-agent-for-ia"
 }
 
 variable "firestore_collection" {
   description = "Nome da coleção"
   type        = string
-  default     = "logs_backstage"
+  default     = "logs-pipes-apps"
 }
 
 variable "firestore_ttl_field" {
