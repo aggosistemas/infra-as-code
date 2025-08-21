@@ -9,20 +9,19 @@ resource "google_project_service" "firestore" {
   disable_on_destroy  = false
 }
 
-# Cria o banco Firestore
+# Cria o banco Firestore (sempre (default))
 resource "google_firestore_database" "default" {
-  name        = var.firestore_database_id   # (default) ou customizado
+  name        = "(default)"                # precisa ser exatamente (default)
   project     = var.gcp_project_id
-  location_id = var.firestore_location
+  location_id = var.firestore_location     # us-central
   type        = "FIRESTORE_NATIVE"
 }
 
 # Configura o campo TTL para a coleção
 resource "google_firestore_field" "logs_pipeline_ttl" {
   project    = var.gcp_project_id
-  database   = google_firestore_database.default.name
+  database   = "(default)"                 # fixo
   collection = var.firestore_collection
   field      = var.firestore_ttl_field
-
- 
+  depends_on = [google_firestore_database.default]
 }

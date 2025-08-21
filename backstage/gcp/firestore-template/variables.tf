@@ -17,9 +17,9 @@ variable "firestore_location" {
 }
 
 variable "firestore_database_id" {
-  description = "ID do banco Firestore. Use (default) para o banco padrão"
+  description = "ID do banco Firestore. Sempre use (default) para o banco padrão"
   type        = string
-  default     = "logs-agent-for-ia"
+  default     = "(default)" 
 }
 
 variable "firestore_collection" {
